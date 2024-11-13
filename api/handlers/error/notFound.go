@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	models "workout-tracker/api/models"
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
@@ -12,7 +13,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("[ERROR] 404 - Not Found | Method: %s | Path: %s", r.Method, r.URL.Path)
 
-	response := ErrorResponse{
+	response := models.ErrorResponse{
 		Status:  http.StatusNotFound,
 		Error:   "not_found",
 		Message: "The requested resource could not be found.",

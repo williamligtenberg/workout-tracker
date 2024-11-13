@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	handlers "workout-tracker/api/handlers/error"
+	models "workout-tracker/api/models"
 )
 
 func RequestLoggerMiddleware(next http.Handler) http.HandlerFunc {
@@ -23,7 +23,7 @@ func RequireAuthMiddleware(next http.Handler) http.HandlerFunc {
 
 			log.Printf("[WARN] Unauthorized access attempt | Method: %s | Path: %s", r.Method, r.URL.Path)
 
-			response := handlers.ErrorResponse{
+			response := models.ErrorResponse{
 				Status:  http.StatusUnauthorized,
 				Error:   "unauthorized",
 				Message: "Authorization token is missing or invalid.",
