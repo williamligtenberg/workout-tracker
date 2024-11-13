@@ -1,11 +1,4 @@
 # workout-tracker
 
-## Start the API
-  ```bash
-  cd api
-  go run .
-  ```
-## Test POST request
-```bash
-Invoke-WebRequest -Uri "http://localhost:8080/users/1" -Headers @{ "Authorization" = "Token" } -Method "POST"
-```
+## 1. Start the API
+To start the API go to [README.md](/api/README.md) and follow the steps.
