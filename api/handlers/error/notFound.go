@@ -1,4 +1,4 @@
-package handlers
+package error
 
 import (
 	"encoding/json"

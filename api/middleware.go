@@ -1,42 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
-	models "workout-tracker/api/models"
 )
 
 func RequestLoggerMiddleware(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[INFO] Incoming request | Method: %s | Path: %s", r.Method, r.URL.Path)
-		next.ServeHTTP(w, r)
-	}
-}
-
-func RequireAuthMiddleware(next http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("Authorization")
-		if token != "Token" {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnauthorized)
-
-			log.Printf("[WARN] Unauthorized access attempt | Method: %s | Path: %s", r.Method, r.URL.Path)
-
-			response := models.ErrorResponse{
-				Status:  http.StatusUnauthorized,
-				Error:   "unauthorized",
-				Message: "Authorization token is missing or invalid.",
-			}
-
-			if err := json.NewEncoder(w).Encode(response); err != nil {
-				log.Printf("[ERROR] Failed to encode unauthorized response: %v", err)
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-			}
-			return
-		}
-
-		log.Printf("[INFO] Authorized request | Method: %s | Path: %s", r.Method, r.URL.Path)
 		next.ServeHTTP(w, r)
 	}
 }

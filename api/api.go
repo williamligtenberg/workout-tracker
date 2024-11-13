@@ -29,7 +29,6 @@ func (s *APIServer) Run() error {
 
 	middlewareChain := MiddlewareChain(
 		RequestLoggerMiddleware,
-		RequireAuthMiddleware,
 	)
 
 	server := http.Server{
