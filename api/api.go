@@ -3,7 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
-	handlers "workout-tracker/api/handlers/user"
+	errorHandler "workout-tracker/api/handlers/error"
+	userHandler "workout-tracker/api/handlers/user"
 )
 
 type APIServer struct {
@@ -17,12 +18,14 @@ func NewAPIServer(addr string) *APIServer {
 }
 
 func (s *APIServer) Run() error {
-	router := http.NewServeMux()
+	mux := http.NewServeMux()
 
-	router.HandleFunc("POST /users", handlers.CreateUser)
-	router.HandleFunc("GET /users/{user_id}", handlers.GetUser)
-	router.HandleFunc("PUT /users/{user_id}", handlers.UpdateUser)
-	router.HandleFunc("DELETE /users/{user_id}", handlers.DeleteUser)
+	mux.HandleFunc("POST /users/{user_id}", userHandler.CreateUser)
+	mux.HandleFunc("GET /users/{user_id}", userHandler.GetUser)
+	mux.HandleFunc("PUT /users/{user_id}", userHandler.UpdateUser)
+	mux.HandleFunc("DELETE /users/{user_id}", userHandler.DeleteUser)
+
+	mux.HandleFunc("/", errorHandler.NotFound)
 
 	middlewareChain := MiddlewareChain(
 		RequestLoggerMiddleware,
@@ -31,10 +34,10 @@ func (s *APIServer) Run() error {
 
 	server := http.Server{
 		Addr:    s.addr,
-		Handler: middlewareChain(router),
+		Handler: middlewareChain(mux),
 	}
 
-	log.Printf("Server is now running on port %s", s.addr)
+	log.Printf("[INFO] Server starting on %s", s.addr)
 
 	return server.ListenAndServe()
 }
