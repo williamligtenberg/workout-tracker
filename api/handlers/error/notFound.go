@@ -11,7 +11,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNotFound)
 
-	log.Printf("[ERROR] 404 - Not Found | Method: %s | Path: %s", r.Method, r.URL.Path)
+	log.Printf("[ERROR] Not Found | Method: %s | Path: %s", r.Method, r.URL.Path)
 
 	response := models.ErrorResponse{
 		Status:  http.StatusNotFound,

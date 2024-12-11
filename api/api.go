@@ -5,6 +5,7 @@ import (
 	"net/http"
 	errorHandler "workout-tracker/api/handlers/error"
 	userHandler "workout-tracker/api/handlers/user"
+	"workout-tracker/api/middleware"
 )
 
 type APIServer struct {
@@ -28,7 +29,7 @@ func (s *APIServer) Run() error {
 	mux.HandleFunc("/", errorHandler.NotFound)
 
 	middlewareChain := MiddlewareChain(
-		RequestLoggerMiddleware,
+		middleware.RequestLoggerMiddleware,
 	)
 
 	server := http.Server{

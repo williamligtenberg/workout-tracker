@@ -1,16 +1,8 @@
 package main
 
 import (
-	"log"
 	"net/http"
 )
-
-func RequestLoggerMiddleware(next http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("[INFO] Incoming request | Method: %s | Path: %s", r.Method, r.URL.Path)
-		next.ServeHTTP(w, r)
-	}
-}
 
 type Middleware func(http.Handler) http.HandlerFunc
 
