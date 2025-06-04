@@ -21,7 +21,10 @@ func NewAPIServer(addr string) *APIServer {
 func (s *APIServer) Run() error {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /users/{user_id}", userHandler.CreateUser)
+	// Pass the db connection to the handler
+	mux.HandleFunc("POST /users", func(w http.ResponseWriter, r *http.Request) {
+		userHandler.CreateUser(w, r)
+	})
 	mux.HandleFunc("GET /users/{user_id}", userHandler.GetUser)
 	mux.HandleFunc("PUT /users/{user_id}", userHandler.UpdateUser)
 	mux.HandleFunc("DELETE /users/{user_id}", userHandler.DeleteUser)
