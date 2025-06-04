@@ -3,10 +3,14 @@ package user
 import (
 	"encoding/json"
 	"net/http"
+	"time"
+	"workout-tracker/api/auth"
 	models "workout-tracker/api/models"
 
 	"log"
 	db "workout-tracker/api/database"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -40,18 +44,44 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	_, err = stmt.Exec(user.Username, user.Email, user.Password)
 	if err != nil {
+		if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
+			log.Printf("[WARN] Duplicate username or email: %v", err)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(map[string]string{
+				"success": "false",
+				"error":   "Username or email already exists",
+			})
+			return
+		}
 		log.Printf("[ERROR] Failed to execute statement: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
+	tokenString, err := auth.GenerateToken(user.Username)
+	if err != nil {
+		log.Printf("[ERROR] Failed to generate JWT token: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    tokenString,
+		HttpOnly: true,
+		Path:     "/",
+		Secure:   true,
+		Expires:  time.Now().Add(24 * time.Hour),
+	})
+
 	log.Printf("[INFO] User created successfully: %s", user.Username)
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("User created successfully"))
 	w.Header().Set("Content-Type", "application/json")
 	response := map[string]string{
-		"message": "User created successfully",
-		"user":    user.Username,
+		"success": "true",
+		"payload": "User created successfully",
+		"id":      user.Username,
 	}
 	json.NewEncoder(w).Encode(response)
 }

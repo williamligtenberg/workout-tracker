@@ -47,11 +47,11 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("[INFO] User deleted successfully: %d", user.Id)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User deleted successfully"))
 	w.Header().Set("Content-Type", "application/json")
 	response := map[string]string{
+		"id":      userID,
+		"success": "true",
 		"message": "User deleted successfully",
-		"user":    user.Username,
 	}
 	json.NewEncoder(w).Encode(response)
 }

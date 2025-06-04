@@ -5,7 +5,26 @@
   cd api
   go run .
   ```
-## Test POST request
-```bash
-Invoke-WebRequest -Uri "http://localhost:8080/users/1" -Headers @{ "Authorization" = "Token" } -Method "POST"
-```
+
+## API endpoints
+### Creating an account
+ Payload:
+  ``` bash
+  {"username": "username", "email": "email", "password": "password"}
+  ```
+  Response:
+  ``` bash
+  {"id": "id", "payload": "User created successfully", "success": "true"}
+  ```
+`Status: 201`
+### Deleting an account
+
+  Payload:
+  ``` bash
+  {"username": "username", "email": "email", "password": "password"}
+  ```
+  Response:
+  ``` bash
+  {"id": "id", "payload": "User created successfully", "success": "true"}
+  ```
+`Status: 201`
