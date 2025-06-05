@@ -22,21 +22,17 @@ func NewAPIServer(addr string) *APIServer {
 func (s *APIServer) Run() error {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /users", func(w http.ResponseWriter, r *http.Request) {
-		userHandler.CreateUser(w, r)
-	})
-	mux.HandleFunc("GET /users/{user_id}", userHandler.GetUser)
-	mux.HandleFunc("DELETE /users/{user_id}", userHandler.DeleteUser)
+	mux.HandleFunc("POST /users", userHandler.CreateUser)
+	mux.HandleFunc("GET /users/{user_uuid}", userHandler.GetUser)
+	mux.HandleFunc("DELETE /users/{user_uuid}", userHandler.DeleteUser)
 
 	mux.HandleFunc("/", errorHandler.NotFound)
 
-	middlewareChain := MiddlewareChain(
-		middleware.RequestLoggerMiddleware,
-	)
+	handlerWithMiddleware := middleware.LoggingMiddleware(mux)
 
 	server := http.Server{
 		Addr:    s.addr,
-		Handler: middlewareChain(mux),
+		Handler: handlerWithMiddleware,
 	}
 
 	log.Printf("[INFO] Server starting on %s", s.addr)

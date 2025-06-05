@@ -12,9 +12,9 @@ func Init(secret string) {
 	jwtKey = []byte(secret)
 }
 
-func GenerateToken(username string) (string, error) {
+func GenerateToken(uuid string) (string, error) {
 	claims := &jwt.RegisteredClaims{
-		Subject:   username,
+		Subject:   uuid,
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		Issuer:    "workout-tracker",

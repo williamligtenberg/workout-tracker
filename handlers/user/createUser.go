@@ -5,15 +5,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/williamligtenberg/workout-tracker/auth"
 	models "github.com/williamligtenberg/workout-tracker/models"
 	"github.com/williamligtenberg/workout-tracker/utils"
 
 	"log"
 
-	db "github.com/williamligtenberg/workout-tracker/database"
-
-	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -43,55 +41,37 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.Password = string(hashedPassword)
+	user.UUID = uuid.NewString()
 
-	stmt, err := db.DB.Prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)")
+	err = models.CreateUser(&user)
 	if err != nil {
-		log.Printf("[ERROR] Failed to prepare statement: %v", err)
-		utils.JSONError(w, http.StatusInternalServerError, "Internal server error")
-		return
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(user.Username, user.Email, hashedPassword)
-	if err != nil {
-		if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
-			log.Printf("[WARN] Duplicate username or email: %v", err)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusConflict)
-			json.NewEncoder(w).Encode(map[string]string{
-				"success": "false",
-				"error":   "Username or email already exists",
-			})
+		if models.IsDuplicateUserError(err) {
+			utils.JSONError(w, http.StatusConflict, "Username or email already exists")
 			return
 		}
-		log.Printf("[ERROR] Failed to execute statement: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		log.Printf("[ERROR] Creating user: %v", err)
+		utils.JSONError(w, http.StatusInternalServerError, "Internal error")
 		return
 	}
 
-	tokenString, err := auth.GenerateToken(user.Username)
+	token, err := auth.GenerateToken(user.UUID)
 	if err != nil {
 		log.Printf("[ERROR] Failed to generate JWT token: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		utils.JSONError(w, http.StatusInternalServerError, "Internal error")
 		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
-		Value:    tokenString,
+		Value:    token,
 		HttpOnly: true,
 		Path:     "/",
 		Secure:   true,
 		Expires:  time.Now().Add(24 * time.Hour),
 	})
 
-	log.Printf("[INFO] User created successfully: %s", user.Username)
-	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Content-Type", "application/json")
-	response := map[string]string{
-		"success": "true",
-		"payload": "User created successfully",
+	utils.JSONSuccess(w, http.StatusCreated, map[string]string{
+		"message": "User created successfully",
 		"id":      user.Username,
-	}
-	json.NewEncoder(w).Encode(response)
+	})
 }
