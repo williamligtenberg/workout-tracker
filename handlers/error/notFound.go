@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	models "workout-tracker/api/models"
+
+	models "github.com/williamligtenberg/workout-tracker/models"
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {

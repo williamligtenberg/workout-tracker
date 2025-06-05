@@ -1,4 +1,30 @@
-# workout-tracker
+# workout-tracker API
 
-## 1. Start the API
-To start the API go to [README.md](/api/README.md) and follow the steps.
+## Start the API
+  ```bash
+  cd api
+  go run .
+  ```
+
+## API endpoints
+### Creating an account
+ Payload:
+  ``` bash
+  {"username": "username", "email": "email", "password": "password"}
+  ```
+  Response:
+  ``` bash
+  {"id": "id", "payload": "User created successfully", "success": "true"}
+  ```
+`Status: 201`
+### Deleting an account
+
+  Payload:
+  ``` bash
+  {"username": "username", "email": "email", "password": "password"}
+  ```
+  Response:
+  ``` bash
+  {"id": "id", "payload": "User created successfully", "success": "true"}
+  ```
+`Status: 201`

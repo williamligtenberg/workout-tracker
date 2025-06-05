@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	db "workout-tracker/api/database"
-	models "workout-tracker/api/models"
+
+	"github.com/williamligtenberg/workout-tracker/auth"
+	db "github.com/williamligtenberg/workout-tracker/database"
 )
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -14,15 +15,31 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.URL.Path[len("/users/"):]
+	// 🔐 Step 1: Extract JWT from cookie
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		http.Error(w, "Unauthorized: missing token", http.StatusUnauthorized)
+		return
+	}
 
+	// 🔐 Step 2: Validate the token
+	claims, err := auth.ValidateToken(cookie.Value)
+	if err != nil {
+		http.Error(w, "Unauthorized: invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	userID := r.URL.Path[len("/users/"):]
 	if userID == "" {
 		log.Printf("[ERROR] User ID is required")
 		http.Error(w, "User ID is required", http.StatusBadRequest)
 		return
 	}
 
-	var user models.User
+	if claims.Subject != userID {
+		http.Error(w, "Forbidden: you can only delete your own account", http.StatusForbidden)
+		return
+	}
 
 	stmt, err := db.DB.Prepare("DELETE FROM users WHERE id = ?")
 	if err != nil {
@@ -45,7 +62,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("[INFO] User deleted successfully: %d", user.Id)
+	log.Printf("[INFO] User deleted successfully")
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	response := map[string]string{

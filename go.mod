@@ -1,4 +1,4 @@
-module workout-tracker/api
+module github.com/williamligtenberg/workout-tracker
 
 go 1.23.3
 
@@ -8,4 +8,5 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/joho/godotenv v1.5.1
+	golang.org/x/crypto v0.38.0
 )

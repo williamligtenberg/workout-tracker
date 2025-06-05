@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
-	errorHandler "workout-tracker/api/handlers/error"
-	userHandler "workout-tracker/api/handlers/user"
-	"workout-tracker/api/middleware"
+
+	errorHandler "github.com/williamligtenberg/workout-tracker/handlers/error"
+	userHandler "github.com/williamligtenberg/workout-tracker/handlers/user"
+	"github.com/williamligtenberg/workout-tracker/middleware"
 )
 
 type APIServer struct {

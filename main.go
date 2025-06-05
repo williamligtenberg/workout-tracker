@@ -2,11 +2,13 @@ package main
 
 import (
 	"log"
-	"workout-tracker/api/auth"
-	"workout-tracker/api/config"
+
+	"github.com/williamligtenberg/workout-tracker/auth"
+	"github.com/williamligtenberg/workout-tracker/config"
 
 	"os"
-	db "workout-tracker/api/database"
+
+	db "github.com/williamligtenberg/workout-tracker/database"
 )
 
 func main() {

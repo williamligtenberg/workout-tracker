@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"workout-tracker/api/config"
+	"github.com/williamligtenberg/workout-tracker/config"
 
 	"github.com/go-sql-driver/mysql"
 )
